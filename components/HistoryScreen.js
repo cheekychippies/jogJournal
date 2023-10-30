@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue } from 'firebase/database';
 
@@ -22,6 +23,7 @@ ref(database, 'routes/')
 
 const HistoryScreen = () => {
     const [routeData, setRouteData] = useState([]);
+    const navigation = useNavigation(); // Käytetään navigaatiota
 
     const routesRef = ref(database, 'routes');
     useEffect(() => {
@@ -63,15 +65,12 @@ const HistoryScreen = () => {
                 style={{ marginLeft: "5%" }}
                 keyExtractor={(route, index) => route.key || index.toString()}
                 renderItem={({ item: route }) => (
-                    <View style={styles.listcontainer}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Map', { routeData: route })} // Siirretään data MapScreenille
+                        style={styles.listcontainer}
+                    >
                         <Text>{route.name}</Text>
-                        <Text
-                            style={{ fontSize: 18, color: '#0000ff' }}
-                            onPress={() => deleteItem(route.key)} // Implement the delete function
-                        >
-                            Delete
-                        </Text>
-                    </View>
+                    </TouchableOpacity>
                 )}
                 data={routeData}
                 ItemSeparatorComponent={listSeparator}
