@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { initializeApp } from "firebase/app";
 import { getDatabase, push, ref, onValue } from 'firebase/database';
+import Modal from 'react-native-modal';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -25,11 +26,35 @@ export default function App() {
   const [location, setLocation] = useState(null);
   const [route, setRoute] = useState([]);
   const [isTracking, setIsTracking] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [routeName, setRouteName] = useState('');
   let subscription = null;
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   const saveRoute = () => {
-    push(ref(database, 'routes/'), route);
-  }
+    if (route.length === 0) {
+      console.log('Route is empty. Nothing to save.');
+      return;
+    }
+
+    toggleModal(); // Close the modal
+    // Create an object that includes the name and route data
+    const routeData = {
+      name: routeName,
+      route: route,
+    };
+
+    // Push the routeData to the database
+    push(ref(database, 'routes/'), routeData);
+
+    // Clear the routeName and route data
+    setRouteName('');
+    setRoute([]);
+  };
+
 
   const startTracking = () => {
     setIsTracking(true);
@@ -118,8 +143,20 @@ export default function App() {
       />
       <Button
         title={'Save run'}
-        onPress={saveRoute}
+        onPress={toggleModal} // Open the modal when "Save run" is clicked
       />
+      <Modal isVisible={isModalVisible}>
+        <View style={styles.modalContent}>
+          <TextInput
+            placeholder="Enter route name"
+            value={routeName}
+            onChangeText={(text) => setRouteName(text)}
+            style={styles.textInput}
+          />
+          <Button title="Save" onPress={saveRoute} />
+          <Button title="Cancel" onPress={toggleModal} />
+        </View>
+      </Modal>
       <Text style={{ textAlign: 'center', marginTop: 10 }}>
         {isTracking ? 'Tracking is active' : 'Tracking is not active'}
       </Text>
@@ -134,5 +171,10 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
   },
 });
