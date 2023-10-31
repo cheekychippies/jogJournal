@@ -27,11 +27,54 @@ const StartRunScreen = () => {
     const [isTracking, setIsTracking] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [routeName, setRouteName] = useState('');
+    const [totalDistance, setTotalDistance] = useState(0);
+    const [timer, setTimer] = useState(0);
+    const [startDate, setStartDate] = useState(null);
+    const [timerIntervalId, setTimerIntervalId] = useState(null);
+
+
     let subscription = null;
+
+    function formatStartDate(date) {
+        if (!date) return '';
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        return date.toLocaleDateString(undefined, options);
+    }
+
+    function calculateDistance(coord1, coord2) {
+        const R = 6371; // Earth's radius in kilometers
+        const lat1 = coord1.latitude;
+        const lon1 = coord1.longitude;
+        const lat2 = coord2.latitude;
+        const lon2 = coord2.longitude;
+
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) *
+            Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        const distance = R * c; // Distance in kilometers
+
+        return distance;
+    }
+
+
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `${hours}:${minutes}:${remainingSeconds}`;
+    }
 
     const saveRoute = () => {
         if (route.length === 0) {
@@ -44,6 +87,9 @@ const StartRunScreen = () => {
         const routeData = {
             name: routeName,
             route: route,
+            distance: totalDistance,
+            time: formatTime(timer),
+            startDate: formatStartDate(startDate)
         };
 
         // Push the routeData to the database
@@ -52,27 +98,39 @@ const StartRunScreen = () => {
         // Clear the routeName and route data
         setRouteName('');
         setRoute([]);
+        setTimer(0);
     };
 
 
     const startTracking = () => {
         setIsTracking(true);
         setRoute([]);
+        setStartDate(new Date());
+        setTotalDistance(0); // Reset the distance
+        setTimer(0); // Reset the timer
+
 
         if (subscription) {
             subscription.remove();
         }
+        const intervalId = setInterval(() => {
+            setTimer((prevTimer) => prevTimer + 1);
+        }, 1000);
 
         startLocationTracking();
+        setTimerIntervalId(intervalId);
     };
 
     const stopTracking = () => {
         setIsTracking(false);
 
+
+
         if (subscription) {
             subscription.remove();
             subscription = null;
         }
+        clearInterval(timerIntervalId);
     };
 
     const startLocationTracking = async () => {
@@ -112,6 +170,17 @@ const StartRunScreen = () => {
 
         getLocation();
     }, [isTracking]);
+    useEffect(() => {
+        let tempTotalDistance = 0;
+
+        for (let i = 1; i < route.length; i++) {
+            const coord1 = route[i - 1];
+            const coord2 = route[i];
+            tempTotalDistance += calculateDistance(coord1, coord2);
+        }
+
+        setTotalDistance(tempTotalDistance);
+    }, [route]);
 
     return (
         <View style={styles.container}>
@@ -156,6 +225,12 @@ const StartRunScreen = () => {
                     <Button title="Cancel" onPress={toggleModal} />
                 </View>
             </Modal>
+            <Text style={{ textAlign: 'center', marginTop: 10 }}>
+                Total Distance: {totalDistance.toFixed(2)} km
+            </Text>
+            <Text style={{ textAlign: 'center', marginTop: 10 }}>
+                Time Elapsed: {formatTime(timer)}
+            </Text>
             <Text style={{ textAlign: 'center', marginTop: 10 }}>
                 {isTracking ? 'Tracking is active' : 'Tracking is not active'}
             </Text>

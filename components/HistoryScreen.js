@@ -69,7 +69,8 @@ const HistoryScreen = () => {
                         onPress={() => navigation.navigate('Map', { routeData: route })} // Siirretään data MapScreenille
                         style={styles.listcontainer}
                     >
-                        <Text>{route.name}</Text>
+                        <Text>{route.name} {route.startDate}</Text>
+                        <Text></Text>
                     </TouchableOpacity>
                 )}
                 data={routeData}

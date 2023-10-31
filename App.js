@@ -2,8 +2,8 @@ import React from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './components/HomeScreen'; 
-import StartRunScreen from './components/StartRunScreen'; 
+import HomeScreen from './components/HomeScreen';
+import StartRunScreen from './components/StartRunScreen';
 import HistoryScreen from './components/HistoryScreen';
 import MapScreen from './components/MapScreen';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 
 const MapScreen = ({ route }) => {
@@ -24,6 +24,14 @@ const MapScreen = ({ route }) => {
                     />
                 )}
             </MapView>
+
+            <Text style={{ textAlign: 'center', marginTop: 10 }}>
+                Time Elapsed: {routeData.time}
+            </Text>
+            <Text style={{ textAlign: 'center', marginTop: 10 }}>
+                Total Distance: {routeData.distance} km
+            </Text>
+
         </View>
     );
 };
