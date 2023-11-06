@@ -52,7 +52,7 @@ const HistoryScreen = () => {
 
     const openModal = (route) => {
         setSelectedRoute(route); // Store the selected route
-        setNewRouteName(route.name); // Set the initial value for editing
+        setNewRouteName(route.name); 
         setModalVisible(true);
     };
 
