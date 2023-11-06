@@ -83,7 +83,7 @@ const StartRunScreen = () => {
         }
 
         toggleModal(); // Close the modal
-        // Create an object that includes the name and route data
+        // Create an object
         const routeData = {
             name: routeName,
             route: route,
@@ -162,7 +162,7 @@ const StartRunScreen = () => {
             const userLocation = await Location.getCurrentPositionAsync({});
             setLocation(userLocation.coords);
 
-            // Start tracking if needed
+        
             if (isTracking) {
                 startLocationTracking();
             }

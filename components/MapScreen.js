@@ -29,7 +29,7 @@ const MapScreen = ({ route }) => {
                 Time Elapsed: {routeData.time}
             </Text>
             <Text style={{ textAlign: 'center', marginTop: 10 }}>
-                Total Distance: {routeData.distance} km
+                Total Distance: {routeData.distance.toFixed(2)} km
             </Text>
 
         </View>

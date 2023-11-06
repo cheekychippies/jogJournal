@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue } from 'firebase/database';
+import { getDatabase, ref, onValue, remove, update } from 'firebase/database';
+import Modal from 'react-native-modal';
 
 
 const EXPO_PUBLIC_firebaseConfig = {
@@ -23,28 +24,49 @@ ref(database, 'routes/')
 
 const HistoryScreen = () => {
     const [routeData, setRouteData] = useState([]);
-    const navigation = useNavigation(); // Käytetään navigaatiota
+    const navigation = useNavigation();
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [newRouteName, setNewRouteName] = useState('');
+    const [selectedRoute, setSelectedRoute] = useState(null); // State to store the selected route
 
     const routesRef = ref(database, 'routes');
     useEffect(() => {
-        // Listen for changes in the routes data
         onValue(routesRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                // Convert the data into an array, assuming it's structured as an object with unique IDs
-                const routesArray = Object.values(data);
+                const routesArray = data ? Object.keys(data).map(key => ({ key, ...data[key] })) : [];
                 setRouteData(routesArray);
             }
         });
 
-        // Clean up the listener when the component unmounts
         return () => {
-            // Stop listening to changes when the component unmounts
-            // This is important to avoid memory leaks
-            // For example: off(routesRef);
+            // Cleanup listener when unmounting
         };
     }, []);
 
+    const deleteRun = (key) => {
+        console.log('deleteRun', key);
+        remove(ref(database, `routes/${key}`));
+        closeModal();
+    }
+
+    const openModal = (route) => {
+        setSelectedRoute(route); // Store the selected route
+        setNewRouteName(route.name); // Set the initial value for editing
+        setModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
+    const editRun = () => {
+        if (selectedRoute) {
+            // Update the routeName in the Firebase database
+            update(ref(database, `routes/${selectedRoute.key}`), { name: newRouteName });
+            closeModal();
+        }
+    }
 
     const listSeparator = () => {
         return (
@@ -66,19 +88,35 @@ const HistoryScreen = () => {
                 keyExtractor={(route, index) => route.key || index.toString()}
                 renderItem={({ item: route }) => (
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Map', { routeData: route })} // Siirretään data MapScreenille
+                        onPress={() => navigation.navigate('Map', { routeData: route })}
                         style={styles.listcontainer}
                     >
                         <Text>{route.name} {route.startDate}</Text>
-                        <Text></Text>
+                        <Button onPress={() => openModal(route)} title="Edit" />
+
                     </TouchableOpacity>
                 )}
                 data={routeData}
                 ItemSeparatorComponent={listSeparator}
             />
+            <Modal isVisible={isModalVisible}>
+                <View style={styles.modalContainer}>
+                    <Text>Edit Route Name:</Text>
+                    <TextInput
+                        value={newRouteName}
+                        onChangeText={(text) => setNewRouteName(text)}
+                    />
+                    <View style={styles.buttonContainer}>
+                        <Button onPress={editRun} title="Update" />
+                        <Button onPress={closeModal} title="Cancel" />
+                        <Button title="Delete" onPress={() => deleteRun(selectedRoute.key)} />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -91,5 +129,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center'
     },
+    modalContainer: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    }
 });
 export default HistoryScreen;
