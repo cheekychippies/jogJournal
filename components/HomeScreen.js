@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { FIREBASE_AUTH } from '../Firebase';
+
 
 const HomeScreen = () => {
     const navigation = useNavigation();
@@ -21,6 +23,10 @@ const HomeScreen = () => {
             <Button
                 title="Run History"
                 onPress={goToRunHistory}
+            />
+            <Button
+                title="Logout"
+                onPress={() => FIREBASE_AUTH.signOut()}
             />
         </View>
     );

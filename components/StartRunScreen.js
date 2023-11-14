@@ -2,25 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { initializeApp } from "firebase/app";
-import { getDatabase, push, ref } from 'firebase/database';
+import { push, ref } from 'firebase/database';
+import { FIREBASE_AUTH, database } from '../Firebase';
 import Modal from 'react-native-modal';
 
-const firebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_API_KEY,
-    authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
-    databaseURL: process.env.EXPO_PUBLIC_DATABASE_URL,
-    projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.EXPO_PUBLIC_APP_ID
-};
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-
 const StartRunScreen = () => {
-    ref(database, 'routes/')
+    const user = FIREBASE_AUTH.currentUser;
+
+    // Check if the user is authenticated before accessing UID
+    const userUid = user ? user.uid : null;
+    const userRoutesRef = userUid ? ref(database, `users/${userUid}/routes`) : null;
+
+    // Rest of the code...
+
 
     const [location, setLocation] = useState(null);
     const [route, setRoute] = useState([]);
@@ -93,7 +87,7 @@ const StartRunScreen = () => {
         };
 
         // Push the routeData to the database
-        push(ref(database, 'routes/'), routeData);
+        push(userRoutesRef, routeData);
 
         // Clear the routeName and route data
         setRouteName('');
@@ -162,7 +156,7 @@ const StartRunScreen = () => {
             const userLocation = await Location.getCurrentPositionAsync({});
             setLocation(userLocation.coords);
 
-        
+
             if (isTracking) {
                 startLocationTracking();
             }

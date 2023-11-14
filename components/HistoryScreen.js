@@ -1,37 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, remove, update } from 'firebase/database';
+import { ref, onValue, remove, update } from 'firebase/database';
+import { FIREBASE_AUTH, database } from '../Firebase'; // Import FIREBASE_AUTH and database from your Firebase module
 import Modal from 'react-native-modal';
-
-
-const EXPO_PUBLIC_firebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_API_KEY,
-    authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
-    databaseURL: process.env.EXPO_PUBLIC_DATABASE_URL,
-    projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.EXPO_PUBLIC_APP_ID
-};
-
-// Initialize Firebase
-const app = initializeApp(EXPO_PUBLIC_firebaseConfig);
-const database = getDatabase(app);
-
-ref(database, 'routes/')
 
 const HistoryScreen = () => {
     const [routeData, setRouteData] = useState([]);
     const navigation = useNavigation();
     const [isModalVisible, setModalVisible] = useState(false);
     const [newRouteName, setNewRouteName] = useState('');
-    const [selectedRoute, setSelectedRoute] = useState(null); // State to store the selected route
+    const [selectedRoute, setSelectedRoute] = useState(null);
 
-    const routesRef = ref(database, 'routes');
+    // Get the current user UID
+    const userUid = FIREBASE_AUTH.currentUser?.uid;
+    const routesRef = userUid ? ref(database, `users/${userUid}/routes`) : null;
+
     useEffect(() => {
-        onValue(routesRef, (snapshot) => {
+        if (!routesRef) {
+            return;
+        }
+
+        // Listen for changes in the user's routes
+        const unsubscribe = onValue(routesRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 const routesArray = data ? Object.keys(data).map(key => ({ key, ...data[key] })) : [];
@@ -39,20 +30,21 @@ const HistoryScreen = () => {
             }
         });
 
+        // Cleanup listener when unmounting
         return () => {
-            // Cleanup listener when unmounting
+            unsubscribe();
         };
-    }, []);
+    }, [routesRef]);
 
     const deleteRun = (key) => {
         console.log('deleteRun', key);
-        remove(ref(database, `routes/${key}`));
+        remove(ref(database, `users/${userUid}/routes/${key}`));
         closeModal();
-    }
+    };
 
     const openModal = (route) => {
-        setSelectedRoute(route); // Store the selected route
-        setNewRouteName(route.name); 
+        setSelectedRoute(route);
+        setNewRouteName(route.name);
         setModalVisible(true);
     };
 
@@ -63,10 +55,10 @@ const HistoryScreen = () => {
     const editRun = () => {
         if (selectedRoute) {
             // Update the routeName in the Firebase database
-            update(ref(database, `routes/${selectedRoute.key}`), { name: newRouteName });
+            update(ref(database, `users/${userUid}/routes/${selectedRoute.key}`), { name: newRouteName });
             closeModal();
         }
-    }
+    };
 
     const listSeparator = () => {
         return (
@@ -93,7 +85,6 @@ const HistoryScreen = () => {
                     >
                         <Text>{route.name} {route.startDate}</Text>
                         <Button onPress={() => openModal(route)} title="Edit" />
-
                     </TouchableOpacity>
                 )}
                 data={routeData}
@@ -140,4 +131,5 @@ const styles = StyleSheet.create({
         marginTop: 10,
     }
 });
+
 export default HistoryScreen;
