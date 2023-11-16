@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, ActivityIndicator, Button, KeyboardAvoidingView } from "react-native";
-import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Image, StyleSheet, ActivityIndicator, KeyboardAvoidingView, TouchableOpacity } from "react-native";
+import React, { useState} from 'react';
 import { FIREBASE_AUTH } from "../Firebase";
-import { TextInput } from "react-native-gesture-handler";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+
+
 
 const Login = () => {
 
@@ -39,14 +40,22 @@ const Login = () => {
     return (
         <View style={styles.container}>
             <KeyboardAvoidingView behavior="padding">
+                <Image source={require('/Users/joukolavonen/Documents/Dokumentit /Opiskelu/Mobiiliohjelmointi/jogJournal/Image/JjLogo.png')} style={styles.image} />
+                <Text style={styles.text}>
+                    Welcome to Jog Journal
+                </Text>
                 <TextInput value={email} style={styles.input} placeholder="Email" autoCapitalize="none"
                     onChangeText={(text) => setEmail(text)}></TextInput>
                 <TextInput secureTextEntry={true} value={password} style={styles.input} placeholder="Password" autoCapitalize="none"
                     onChangeText={(text) => setPassword(text)}></TextInput>
                 {loading ? (
                     <ActivityIndicator size="large" color="#0000ff" />) : (<>
-                        <Button title="Login" onPress={signIn} />
-                        <Button title="Create account" onPress={signUp} />
+                        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={signIn}>
+                            <Text style={styles.buttonText}>Sign In</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.button, styles.createAccountButton]} onPress={signUp}>
+                            <Text style={styles.buttonText}>Sign Up</Text>
+                        </TouchableOpacity>
                     </>)}
             </KeyboardAvoidingView>
         </View>
@@ -56,9 +65,26 @@ export default Login
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 20,
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+        backgroundColor: '#111111'
+    },
+    image: {
+        alignSelf: 'center',
+        width: 320,
+        height: 250,
+        borderRadius: 50,
+        overflow: 'hidden',
+        paddingBottom: 40
+    },
+    text: {
+        textAlign: 'center',
+        fontFamily: '',
+        fontSize: 25,
+        paddingBottom: 30,
+        paddingTop: 30,
+        color: '#ffffff'
     },
     input: {
         marginVertical: 4,
@@ -68,5 +94,22 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff'
 
-    }
-})
+    },
+    button: {
+        height: 50,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    loginButton: {
+        backgroundColor: '#3498db',
+    },
+    createAccountButton: {
+        backgroundColor: '#2ecc71',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+});
