@@ -40,7 +40,7 @@ const Login = () => {
     return (
         <View style={styles.container}>
             <KeyboardAvoidingView behavior="padding">
-                <Image source={require('/Users/joukolavonen/Documents/Dokumentit /Opiskelu/Mobiiliohjelmointi/jogJournal/Image/JjLogo.png')} style={styles.image} />
+                <Image source={require('../Image/JjLogo.png')} style={styles.image} />
                 <Text style={styles.text}>
                     Welcome to Jog Journal
                 </Text>
@@ -49,7 +49,7 @@ const Login = () => {
                 <TextInput secureTextEntry={true} value={password} style={styles.input} placeholder="Password" autoCapitalize="none"
                     onChangeText={(text) => setPassword(text)}></TextInput>
                 {loading ? (
-                    <ActivityIndicator size="large" color="#0000ff" />) : (<>
+                    <ActivityIndicator size="large" color="white" />) : (<>
                         <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={signIn}>
                             <Text style={styles.buttonText}>Sign In</Text>
                         </TouchableOpacity>

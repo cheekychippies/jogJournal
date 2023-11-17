@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import { Header } from '@rneui/themed';
+import { useState } from 'react';
 
 const MapScreen = ({ route }) => {
     const { routeData } = route.params;
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(true);
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
@@ -21,8 +23,20 @@ const MapScreen = ({ route }) => {
         });
     }, [navigation]);
 
+
+    const onMapReady = () => {
+        setLoading(false);
+    };
+
     return (
         <View style={styles.container}>
+            {loading && (
+                <ActivityIndicator
+                    style={styles.activityIndicator}
+                    size="large"
+                    color="#fff"
+                />
+            )}
             <MapView
                 style={styles.map}
                 initialRegion={{
@@ -31,6 +45,7 @@ const MapScreen = ({ route }) => {
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                 }}
+                onMapReady={onMapReady}
             >
                 {routeData.route.length > 1 && (
                     <Polyline
@@ -68,7 +83,17 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         paddingTop: 10,
         color: '#ffffff'
-    }
+    },
+    activityIndicator: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(17, 17, 17, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 
 export default MapScreen;

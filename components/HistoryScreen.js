@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Button } from 'react-native';
+import { View, Text, TextInput, StyleSheet, FlatList, ActivityIndicator, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ref, onValue, remove, update } from 'firebase/database';
 import { FIREBASE_AUTH, database } from '../Firebase'; // Import FIREBASE_AUTH and database from your Firebase module
 import Modal from 'react-native-modal';
+import { ListItem, Avatar } from '@rneui/themed';
+import { Header } from '@rneui/themed';
+import { Icon } from '@rneui/themed';
 
 const HistoryScreen = () => {
     const [routeData, setRouteData] = useState([]);
@@ -11,6 +14,18 @@ const HistoryScreen = () => {
     const [isModalVisible, setModalVisible] = useState(false);
     const [newRouteName, setNewRouteName] = useState('');
     const [selectedRoute, setSelectedRoute] = useState(null);
+
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+            header: () => (
+                <Header
+                    centerComponent={{ text: 'HISTORY', style: { color: '#fff' } }}
+                    rightComponent={{ icon: 'home', color: '#fff', onPress: () => navigation.navigate('Home'), }}
+                    containerStyle={{ backgroundColor: '#111111' }}
+                />
+            ),
+        });
+    }, [navigation]);
 
     // Get the current user UID
     const userUid = FIREBASE_AUTH.currentUser?.uid;
@@ -60,35 +75,31 @@ const HistoryScreen = () => {
         }
     };
 
-    const listSeparator = () => {
-        return (
-            <View
-                style={{
-                    height: 5,
-                    width: "80%",
-                    backgroundColor: "#fff",
-                    marginLeft: "10%"
-                }}
+    const renderItem = ({ item: route }) => (
+        <ListItem bottomDivider onPress={() => navigation.navigate('Map', { routeData: route })}
+            containerStyle={styles.listItemContainer}>
+            <Avatar
+                rounded
+                source={{ uri: "https://sunriserunco.com/wp-content/uploads/2020/03/52-Motivational-Running-Quotes-to-Keep-You-Inspired-1200x600.jpg" }}
             />
-        );
-    };
+            <ListItem.Content>
+                <ListItem.Title style={styles.text}>{route.name}</ListItem.Title>
+                <ListItem.Subtitle style={styles.subText}>{route.startDate}</ListItem.Subtitle>
+            </ListItem.Content>
+            <Icon name='edit' color={'white'} onPress={() => openModal(route)} title="Edit" />
+        </ListItem>
+    );
 
     return (
         <View style={styles.container}>
             <FlatList
-                style={{ marginLeft: "5%" }}
+                style={styles.list}
                 keyExtractor={(route, index) => route.key || index.toString()}
-                renderItem={({ item: route }) => (
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('Map', { routeData: route })}
-                        style={styles.listcontainer}
-                    >
-                        <Text>{route.name} {route.startDate}</Text>
-                        <Button onPress={() => openModal(route)} title="Edit" />
-                    </TouchableOpacity>
-                )}
+                renderItem={renderItem}
                 data={routeData}
-                ItemSeparatorComponent={listSeparator}
+                ListEmptyComponent={() => (
+                    <ActivityIndicator size="large" color="#ffffff" />
+                )}
             />
             <Modal isVisible={isModalVisible}>
                 <View style={styles.modalContainer}>
@@ -114,6 +125,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#111111'
     },
     listcontainer: {
         flexDirection: 'row',
@@ -129,7 +141,24 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
-    }
+    },
+    list: {
+        width: '100%',
+    },
+    listItemContainer: {
+        backgroundColor: '#111111',
+    },
+    text: {
+        textAlign: 'center',
+        fontSize: 20,
+        color: '#ffffff'
+    },
+    subText: {
+        textAlign: 'center',
+        fontSize: 15,
+        color: '#ffffff'
+    },
+
 });
 
 export default HistoryScreen;

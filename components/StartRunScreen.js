@@ -183,7 +183,7 @@ const StartRunScreen = () => {
         <View style={styles.container}>
             {isLoading ? (
                 <View>
-                    <Image source={require('/Users/joukolavonen/Documents/Dokumentit /Opiskelu/Mobiiliohjelmointi/jogJournal/Image/JjLogo.png')} style={styles.image} />
+                    <Image source={require('../Image/JjLogo.png')} style={styles.image} />
                     <Text style={styles.text}>Loading Map</Text>
                     <ActivityIndicator size="large" color='#ffffff' />
                 </View>

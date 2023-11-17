@@ -31,7 +31,7 @@ const HomeScreen = () => {
         <View style={styles.container}>
             <Text style={styles.text}>What Do You Want To Do?</Text>
             <Image
-                source={require('/Users/joukolavonen/Documents/Dokumentit /Opiskelu/Mobiiliohjelmointi/jogJournal/Image/Run2.png')}
+                source={require('../Image/Run2.png')}
                 style={styles.image}
             />
 
