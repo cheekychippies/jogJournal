@@ -12,6 +12,7 @@ import { FIREBASE_AUTH } from './Firebase';
 
 
 
+
 const Stack = createStackNavigator();
 
 const InsideStack = createStackNavigator();

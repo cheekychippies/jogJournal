@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Image, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { push, ref } from 'firebase/database';
 import { FIREBASE_AUTH, database } from '../Firebase';
+import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
+import { Header } from '@rneui/themed';
 
 const StartRunScreen = () => {
     const user = FIREBASE_AUTH.currentUser;
@@ -12,10 +14,7 @@ const StartRunScreen = () => {
     // Check if the user is authenticated before accessing UID
     const userUid = user ? user.uid : null;
     const userRoutesRef = userUid ? ref(database, `users/${userUid}/routes`) : null;
-
-    // Rest of the code...
-
-
+    const [isLoading, setIsLoading] = useState(true);
     const [location, setLocation] = useState(null);
     const [route, setRoute] = useState([]);
     const [isTracking, setIsTracking] = useState(false);
@@ -25,6 +24,19 @@ const StartRunScreen = () => {
     const [timer, setTimer] = useState(0);
     const [startDate, setStartDate] = useState(null);
     const [timerIntervalId, setTimerIntervalId] = useState(null);
+    const navigation = useNavigation();
+
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+            header: () => (
+                <Header
+                    centerComponent={{ text: 'RUN', style: { color: '#fff' } }}
+                    rightComponent={{ icon: 'home', color: '#fff', onPress: () => navigation.navigate('Home'), }}
+                    containerStyle={{ backgroundColor: '#111111' }}
+                />
+            ),
+        });
+    }, [navigation]);
 
 
     let subscription = null;
@@ -160,6 +172,7 @@ const StartRunScreen = () => {
             if (isTracking) {
                 startLocationTracking();
             }
+            setIsLoading(false);
         };
 
         getLocation();
@@ -178,35 +191,53 @@ const StartRunScreen = () => {
 
     return (
         <View style={styles.container}>
-            {location && (
-                <MapView
-                    style={styles.map}
-                    showsUserLocation
-                    initialRegion={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05,
-                    }}
-                >
-                    {route.length > 1 && (
-                        <Polyline
-                            coordinates={route}
-                            strokeWidth={4}
-                            strokeColor="#00f"
-                        />
-                    )}
-                </MapView>
+            {isLoading ? (
+                <View>
+                    <Image source={require('/Users/joukolavonen/Documents/Dokumentit /Opiskelu/Mobiiliohjelmointi/jogJournal/Image/JjLogo.png')} style={styles.image} />
+                    <Text style={styles.text}>Loading Map</Text>
+                    <ActivityIndicator size="large" color='#ffffff' />
+                </View>
+            ) : (
+                location && (
+                    <MapView
+                        style={styles.map}
+                        showsUserLocation
+                        initialRegion={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                            latitudeDelta: 0.05,
+                            longitudeDelta: 0.05,
+                        }}
+                    >
+                        {route.length > 1 && (
+                            <Polyline
+                                coordinates={route}
+                                strokeWidth={4}
+                                strokeColor="#00f"
+                            />
+                        )}
+                    </MapView>
+                )
             )}
-            <Button
-                title={isTracking ? 'Stop Tracking' : 'Start Tracking'}
-                onPress={isTracking ? stopTracking : startTracking}
-                color={isTracking ? 'red' : 'green'}
-            />
-            <Button
-                title={'Save run'}
-                onPress={toggleModal} // Open the modal when "Save run" is clicked
-            />
+            {!isLoading && (
+                <>
+                    <Button
+                        title={isTracking ? 'Stop Tracking' : 'Start Tracking'}
+                        onPress={isTracking ? stopTracking : startTracking}
+                        color={isTracking ? 'red' : 'green'}
+                    />
+                    <Button
+                        title={'Save run'}
+                        onPress={toggleModal} // Open the modal when "Save run" is clicked
+                    />
+                    <Text style={styles.runText}>
+                        Total Distance: {totalDistance.toFixed(2)} km
+                    </Text>
+                    <Text style={styles.runText}>
+                        Time Elapsed: {formatTime(timer)}
+                    </Text>
+                </>
+            )}
             <Modal isVisible={isModalVisible}>
                 <View style={styles.modalContent}>
                     <TextInput
@@ -219,12 +250,7 @@ const StartRunScreen = () => {
                     <Button title="Cancel" onPress={toggleModal} />
                 </View>
             </Modal>
-            <Text style={{ textAlign: 'center', marginTop: 10 }}>
-                Total Distance: {totalDistance.toFixed(2)} km
-            </Text>
-            <Text style={{ textAlign: 'center', marginTop: 10 }}>
-                Time Elapsed: {formatTime(timer)}
-            </Text>
+            
             <Text style={{ textAlign: 'center', marginTop: 10 }}>
                 {isTracking ? 'Tracking is active' : 'Tracking is not active'}
             </Text>
@@ -234,10 +260,35 @@ const StartRunScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#111111',
+    },
+    image: {
+        alignSelf: 'center',
+        width: 400,
+        height: 300,
+        //borderRadius: 50,
+        overflow: 'hidden',
+        paddingBottom: 40
     },
     map: {
         flex: 1,
+    },
+    text: {
+        textAlign: 'center',
+        fontSize: 25,
+        paddingBottom: 30,
+        paddingTop: 30,
+        color: '#ffffff'
+    },
+    runText: {
+        textAlign: 'center',
+        fontSize: 20,
+        paddingBottom: 10,
+        paddingTop: 10,
+        color: '#ffffff'
+    },
+    textInput: {
+       
     },
     modalContent: {
         backgroundColor: 'white',
