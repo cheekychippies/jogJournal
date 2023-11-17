@@ -10,9 +10,6 @@ import Login from './screens/Login';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH } from './Firebase';
 
-
-
-
 const Stack = createStackNavigator();
 
 const InsideStack = createStackNavigator();

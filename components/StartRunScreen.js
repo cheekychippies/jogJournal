@@ -46,7 +46,6 @@ const StartRunScreen = () => {
         const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
         return date.toLocaleDateString(undefined, options);
     }
-
     function calculateDistance(coord1, coord2) {
         const R = 6371; // Earth's radius in kilometers
         const lat1 = coord1.latitude;
@@ -69,9 +68,6 @@ const StartRunScreen = () => {
 
         return distance;
     }
-
-
-
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
@@ -81,7 +77,6 @@ const StartRunScreen = () => {
         const remainingSeconds = seconds % 60;
         return `${hours}:${minutes}:${remainingSeconds}`;
     }
-
     const saveRoute = () => {
         if (route.length === 0) {
             console.log('Route is empty. Nothing to save.');
@@ -106,8 +101,6 @@ const StartRunScreen = () => {
         setRoute([]);
         setTimer(0);
     };
-
-
     const startTracking = () => {
         setIsTracking(true);
         setRoute([]);
@@ -126,7 +119,6 @@ const StartRunScreen = () => {
         startLocationTracking();
         setTimerIntervalId(intervalId);
     };
-
     const stopTracking = () => {
         setIsTracking(false);
 
@@ -138,7 +130,6 @@ const StartRunScreen = () => {
         }
         clearInterval(timerIntervalId);
     };
-
     const startLocationTracking = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
@@ -156,7 +147,6 @@ const StartRunScreen = () => {
             }
         );
     };
-
     useEffect(() => {
         const getLocation = async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -250,7 +240,7 @@ const StartRunScreen = () => {
                     <Button title="Cancel" onPress={toggleModal} />
                 </View>
             </Modal>
-            
+
             <Text style={{ textAlign: 'center', marginTop: 10 }}>
                 {isTracking ? 'Tracking is active' : 'Tracking is not active'}
             </Text>
@@ -288,7 +278,7 @@ const styles = StyleSheet.create({
         color: '#ffffff'
     },
     textInput: {
-       
+
     },
     modalContent: {
         backgroundColor: 'white',
