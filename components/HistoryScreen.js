@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, ActivityIndicator, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ref, onValue, remove, update } from 'firebase/database';
-import { FIREBASE_AUTH, database } from '../Firebase'; // Import FIREBASE_AUTH and database from your Firebase module
+import { FIREBASE_AUTH, database } from '../Firebase'; 
 import Modal from 'react-native-modal';
 import { ListItem, Avatar } from '@rneui/themed';
 import { Header } from '@rneui/themed';

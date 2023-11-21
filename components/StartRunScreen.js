@@ -167,6 +167,7 @@ const StartRunScreen = () => {
 
         getLocation();
     }, [isTracking]);
+    
     useEffect(() => {
         let tempTotalDistance = 0;
 
