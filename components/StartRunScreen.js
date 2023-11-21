@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, Button, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Image, Button, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { push, ref } from 'firebase/database';
@@ -211,21 +211,38 @@ const StartRunScreen = () => {
             )}
             {!isLoading && (
                 <>
-                    <Button
-                        title={isTracking ? 'Stop Tracking' : 'Start Tracking'}
-                        onPress={isTracking ? stopTracking : startTracking}
-                        color={isTracking ? 'red' : 'green'}
-                    />
-                    <Button
-                        title={'Save run'}
-                        onPress={toggleModal} // Open the modal when "Save run" is clicked
-                    />
                     <Text style={styles.runText}>
                         Total Distance: {totalDistance.toFixed(2)} km
                     </Text>
                     <Text style={styles.runText}>
                         Time Elapsed: {formatTime(timer)}
                     </Text>
+                    <TouchableOpacity
+                        onPress={isTracking ? stopTracking : startTracking}
+                        style={{
+                            backgroundColor: isTracking ? 'red' : '#00adb5',
+                            height: 40,
+                            borderRadius: 4,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginVertical: 5,
+                            marginTop: 10
+                        }}
+                    >
+                        <Text style={{ color: 'white' }}>
+                            {isTracking ? 'Stop Tracking' : 'Start Tracking'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={toggleModal}
+                        style={
+                            [styles.button]
+                        }
+                    >
+                        <Text style={{ color: 'white' }}>Save run</Text>
+                    </TouchableOpacity>
+
                 </>
             )}
             <Modal isVisible={isModalVisible}>
@@ -272,18 +289,23 @@ const styles = StyleSheet.create({
     },
     runText: {
         textAlign: 'center',
-        fontSize: 20,
+        fontSize: 15,
         paddingBottom: 10,
         paddingTop: 10,
         color: '#ffffff'
-    },
-    textInput: {
-
     },
     modalContent: {
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
+    },
+    button: {
+        height: 40,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 5,
+        backgroundColor: '#3498db',
     },
 });
 
