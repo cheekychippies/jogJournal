@@ -3,7 +3,7 @@ import { View, Text, TextInput, Image, Button, StyleSheet, ActivityIndicator, To
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { push, ref } from 'firebase/database';
-import { FIREBASE_AUTH, database } from '../Firebase';
+import { FIREBASE_AUTH, database, app } from '../Firebase';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import { Header } from '@rneui/themed';
