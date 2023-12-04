@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, ActivityIndicator, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ref, onValue, remove, update } from 'firebase/database';
-import { FIREBASE_AUTH, database } from '../Firebase'; 
+import { FIREBASE_AUTH, database } from '../Firebase';
 import Modal from 'react-native-modal';
 import { ListItem, Avatar } from '@rneui/themed';
 import { Header } from '@rneui/themed';
@@ -53,9 +53,20 @@ const HistoryScreen = () => {
 
     const deleteRun = (key) => {
         console.log('deleteRun', key);
-        remove(ref(database, `users/${userUid}/routes/${key}`));
+        // Remove the route from Firebase
+        remove(ref(database, `users/${userUid}/routes/${key}`))
+            .then(() => {
+                //Update list
+                const updatedRoutes = routeData.filter(route => route.key !== key);
+                setRouteData(updatedRoutes);
+            })
+            .catch(error => {
+                console.error('Error deleting run:', error);
+            });
+
         closeModal();
     };
+
 
     const openModal = (route) => {
         setSelectedRoute(route);
@@ -98,7 +109,7 @@ const HistoryScreen = () => {
                 renderItem={renderItem}
                 data={routeData}
                 ListEmptyComponent={() => (
-                    <ActivityIndicator size="large" color="#ffffff" />
+                    <Text style={styles.noRunText}>You Haven't Logged Any Runs Yet</Text>
                 )}
             />
             <Modal isVisible={isModalVisible}>
@@ -152,6 +163,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
         color: '#ffffff'
+    },
+    noRunText: {
+        textAlign: 'center',
+        fontSize: 20,
+        color: '#ffffff',
+        marginTop: 20
     },
     subText: {
         textAlign: 'center',
