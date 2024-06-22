@@ -1,4 +1,4 @@
-Jog Journal is a user-friendly mobile sports tracking application that allows users to track, store, and view their exercises on a map.
+Jog Journal is a simple mobile sports tracking application that allows users to track, store, and view their exercises on a map.
 
 Technologies Used in the Application
 
