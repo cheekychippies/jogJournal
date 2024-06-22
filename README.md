@@ -1,20 +1,20 @@
 
-Sovelluksessa käytetyt teknologiat
+Technologies Used in the Application
 
-Firebase: Käytän Firebasen palveluita, kuten Firebase Authentication ja Firebase Realtime Database. Firebase Authentication tarjoaa käyttäjänkirjautumisen ja Firebase Realtime Database mahdollistaa reaaliaikaisen tietokannan tallennuksen.
+Firebase: I use Firebase services such as Firebase Authentication and Firebase Realtime Database. Firebase Authentication provides user login functionality, and Firebase Realtime Database enables real-time database storage.
 
-Expo: Expo location, mikä mahdollistaa sijainnin seuranna.
+Expo: Expo location, which allows for location tracking.
 
-React Navigation: Käytän React Navigation -kirjastoa sovelluksen navigaatioon.
+React Navigation: I use the React Navigation library for application navigation.
 
-react-native-maps: Sovelluksessa on karttanäkymä, ja käytän react-native-maps kirjastoa karttojen käsittelyyn.
+react-native-maps: The application features a map view, and I use the react-native-maps library for handling maps.
 
-Modal: Käytät react-native-modal kirjastoa modaalien luomiseen.
+Modal: I use the react-native-modal library for creating modals.
 
-@rneui/themed: Näyttäisi siltä, että käytät RNEUI-kirjastoa (React Native Elements UI), joka tarjoaa valmiita UI-komponentteja.
+@rneui/themed: It appears that you use the RNEUI library (React Native Elements UI), which provides ready-made UI components.
 
-useEffect ja useState: Reactin useEffect- ja useState-koukut ovat laajasti käytössä asynkronisten toimintojen hallinnassa ja tilan hallinnassa.
+useEffect and useState: The React hooks useEffect and useState are extensively used for managing asynchronous operations and state management.
 
-Async/Await: Koodissasi käytetään async/await-rakennetta asynkronisten toimintojen käsittelyyn, kuten Firebase-kirjaston kutsut.
+Async/Await: Your code uses the async/await structure for handling asynchronous operations, such as Firebase library calls.
 
-TouchableOpacity: React Nativessa käytetty komponentti, joka tarjoaa "klikattavan" alueen, joka muuttuu läpinäkyväksi painettaessa.
+TouchableOpacity: A component used in React Native that provides a "clickable" area that becomes transparent when pressed.
